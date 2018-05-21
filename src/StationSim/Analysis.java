@@ -16,7 +16,6 @@
 
 package StationSim;
 
-import com.sun.deploy.util.StringUtils;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Bag;
@@ -343,7 +342,7 @@ public class Analysis implements Steppable {
                     "utf-8"));
 
             for (List<String> line : dataFrame) {
-                writer.write(StringUtils.join(line, ",") + System.lineSeparator());
+                writer.write(String.join(",", line) + System.lineSeparator());
             }
         } catch (IOException ex) {
             System.out.println("Error writing to file");
