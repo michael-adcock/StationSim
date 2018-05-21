@@ -16,10 +16,9 @@
 package StationSim;
 
 import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.util.Bag;
 import sim.util.Double2D;
-import sim.util.Int2D;
+
 
 /** Serves as a target for persons to move towards to. Removes a person from the simulation when
  *  they reach the exit. People are removed every n steps dictated by exitInterval. The maximum

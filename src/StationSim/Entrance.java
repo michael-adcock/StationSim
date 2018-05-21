@@ -81,8 +81,6 @@ public class Entrance extends Agent {
                     station.area.setObjectLocation(person, spawnLocation);
                     addedCount++;
                     station.addedCount++;
-                    System.out.println(station.addedCount);
-
                 }
             }
             // Number of people left for further steps
