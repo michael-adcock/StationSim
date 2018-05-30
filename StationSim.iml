@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="mason" level="project" />
     <orderEntry type="library" name="libraries" level="project" />
+    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="io.improbable:keanu:0.0.7" level="project" />
   </component>
 </module>
