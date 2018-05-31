@@ -22,11 +22,23 @@ public class Model {
 
     public static void main(String[] args) {
 
-        System.out.println("Loading data from a csv file");
+        System.out.println("Java");
         Data coalMiningDisasterData = Data.load("dummy.csv");
+
+        //for (int i = 0; i < coalMiningDisasterData.yearToDisasterCounts.size(); i++) {
+        //    System.out.println("key : " + i + "\tvalue: " + coalMiningDisasterData.yearToDisasterCounts.get(i));
+
+        //}
+
+
 
         System.out.println("Creating model using loaded data");
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
+
+        //System.out.println(coalMiningDisastersModel.startYearVertex.getDerivedValue());
+        //System.out.println(coalMiningDisastersModel.endYearVertex.getDerivedValue());
+
+
 
         System.out.println("Running model...");
         coalMiningDisastersModel.run();
@@ -59,6 +71,13 @@ public class Model {
         earlyRate = new ExponentialVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0));
         lateRate = new ExponentialVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0));
 
+
+        System.out.println("Early Rate: " + earlyRate.getValue());
+        System.out.println("Late Rate: " + lateRate.getValue());
+        System.out.println("Switchpoint: " + switchpoint.getValue());
+
+
+
         Stream<IfVertex<Double>> rates = IntStream.range(data.startYear, data.endYear).boxed()
                 .map(ConstantVertex::new)
                 .map(year -> {
@@ -66,20 +85,37 @@ public class Model {
                             switchpoint,
                             year
                     );
+                    //System.out.println(switchpointGreaterThanYear + " " + earlyRate + " " + lateRate);
                     return new IfVertex<>(switchpointGreaterThanYear, earlyRate, lateRate);
                 });
+
+
+        //rates.forEach(
+        //        element -> System.out.println(element.getDerivedValue()));
+
+
 
         disasters = rates
                 .map(CastDoubleVertex::new)
                 .map(rate -> new PoissonVertex(rate))
                 .collect(Collectors.toList());
 
+        //disasters.forEach(
+        //element -> System.out.println(element.getValue()));
+
         IntStream.range(0, disasters.size()).forEach(i -> {
             Integer year = data.startYear + i;
             Integer observedValue = data.yearToDisasterCounts.get(year);
             disasters.get(i).observe(observedValue);
         });
+
+        //disasters.forEach(
+        //        element -> System.out.println(element.getValue()));
+        //System.exit(0);
     }
+
+
+
 
     /**
      * Runs the MetropolisHastings algorithm and saves the resulting samples to results
