@@ -23,7 +23,7 @@ public class Model {
     public static void main(String[] args) {
 
         System.out.println("Java");
-        Data coalMiningDisasterData = Data.load("dummy.csv");
+        Data coalMiningDisasterData = Data.load("coal-mining-disaster-data.csv");
 
         //for (int i = 0; i < coalMiningDisasterData.yearToDisasterCounts.size(); i++) {
         //    System.out.println("key : " + i + "\tvalue: " + coalMiningDisasterData.yearToDisasterCounts.get(i));
@@ -45,8 +45,12 @@ public class Model {
         System.out.println("Run complete");
 
         int switchYear = coalMiningDisastersModel.results.get(coalMiningDisastersModel.switchpoint).getMode();
-
+        double late = coalMiningDisastersModel.results.get(coalMiningDisastersModel.lateRate).getMode();
+        double early = coalMiningDisastersModel.results.get(coalMiningDisastersModel.earlyRate).getMode();
         System.out.println("Switch year found: " + switchYear);
+        System.out.println("early rate: " + early);
+        System.out.println("late rate: " + late);
+        System.out.println(coalMiningDisastersModel.results.get(coalMiningDisastersModel.lateRate).asList());
     }
 
     private final Random r;
@@ -72,12 +76,6 @@ public class Model {
         lateRate = new ExponentialVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0));
 
 
-        System.out.println("Early Rate: " + earlyRate.getValue());
-        System.out.println("Late Rate: " + lateRate.getValue());
-        System.out.println("Switchpoint: " + switchpoint.getValue());
-
-
-
         Stream<IfVertex<Double>> rates = IntStream.range(data.startYear, data.endYear).boxed()
                 .map(ConstantVertex::new)
                 .map(year -> {
@@ -89,9 +87,6 @@ public class Model {
                     return new IfVertex<>(switchpointGreaterThanYear, earlyRate, lateRate);
                 });
 
-
-        //rates.forEach(
-        //        element -> System.out.println(element.getDerivedValue()));
 
 
 
@@ -113,7 +108,6 @@ public class Model {
         //        element -> System.out.println(element.getValue()));
         //System.exit(0);
     }
-
 
 
 
