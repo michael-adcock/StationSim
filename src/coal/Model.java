@@ -23,6 +23,7 @@ public class Model {
     public static void main(String[] args) {
 
         System.out.println("Java");
+        //Data coalMiningDisasterData = Data.load("coal-mining-disaster-data.csv");
         Data coalMiningDisasterData = Data.load("dummy2.csv");
 
         //for (int i = 0; i < coalMiningDisasterData.yearToDisasterCounts.size(); i++) {
@@ -30,15 +31,11 @@ public class Model {
 
         //}
 
-
-
         System.out.println("Creating model using loaded data");
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
 
         //System.out.println(coalMiningDisastersModel.startYearVertex.getDerivedValue());
         //System.out.println(coalMiningDisastersModel.endYearVertex.getDerivedValue());
-
-
 
         System.out.println("Running model...");
         coalMiningDisastersModel.run();
