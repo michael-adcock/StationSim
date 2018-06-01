@@ -53,8 +53,12 @@ fun findSwitchpoint() {
     val lambdaThree = ExponentialVertex(alpha, alpha) //Why two inputs?
 
     // Define switchpoint prior
-    val tauOne = UniformIntVertex(ConstantVertex(startStep), ConstantVertex(endStep + 1))
-    val tauTwo = UniformIntVertex(ConstantVertex(startStep), ConstantVertex(endStep + 1))
+    //val tauOne = UniformIntVertex(ConstantVertex(startStep), ConstantVertex(endStep + 1))
+    //val tauTwo = UniformIntVertex(ConstantVertex(startStep), ConstantVertex(endStep + 1))
+    //val maxValue = data.values.max()!!
+    val maxPoint = data.maxBy { it.value }?.key
+    val tauOne = UniformIntVertex(ConstantVertex(startStep), ConstantVertex(maxPoint))
+    val tauTwo = UniformIntVertex(ConstantVertex(maxPoint), ConstantVertex(endStep + 1))
 
 
     // switchpoint before and after
@@ -63,9 +67,10 @@ fun findSwitchpoint() {
             .map { step ->
                 val switchpointOneGreaterThanStep = GreaterThanVertex<Int, Int>(tauOne, step)
                 val switchpointTwoGreaterThanStep = GreaterThanVertex<Int, Int>(tauTwo, step)
-                val first = IfVertex<Double>(switchpointOneGreaterThanStep, lambdaOne, lambdaTwo)
-                IfVertex<Double>(switchpointTwoGreaterThanStep, first, lambdaThree)
-
+                ElifVertex<Double>(switchpointOneGreaterThanStep, switchpointTwoGreaterThanStep,
+                        lambdaTwo, lambdaTwo, lambdaThree)
+                //val first = IfVertex<Double>(switchpointOneGreaterThanStep, lambdaOne, lambdaTwo)
+                //IfVertex<Double>(switchpointTwoGreaterThanStep, first, lambdaThree)
             }
 
     //rates.forEach { element -> println(element.derivedValue) }
@@ -81,6 +86,8 @@ fun findSwitchpoint() {
     IntStream.range(0, crowding.size).forEach { step ->
         crowding[step].observe(data.getValue(step))
     }
+
+    println(lambdaOne.connectedGraph)
 
     //run model
     val numSamples = 50000
@@ -104,8 +111,8 @@ fun findSwitchpoint() {
 
     //charts
     var dataset = HistogramDataset()
-    dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-    dataset.addSeries("Histogram", before.asList().toDoubleArray(), 10);
+    dataset.setType(HistogramType.RELATIVE_FREQUENCY)
+    dataset.addSeries("Histogram", before.asList().toDoubleArray(), 10)
     var plotTitle = "Before Crowding"
     var xaxis = "Number of People"
     var yaxis = "Frequency"
@@ -116,18 +123,18 @@ fun findSwitchpoint() {
     var chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis,
             dataset, orientation, show, toolTips, urls)
     var frame = ChartFrame("Crowding Density", chart)
-    frame.setVisible(true);
-    frame.pack();
+    frame.setVisible(true)
+    frame.pack()
 
     dataset = HistogramDataset()
     dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-    dataset.addSeries("Histogram", during.asList().toDoubleArray(), 10);
+    dataset.addSeries("Histogram", during.asList().toDoubleArray(), 10)
     plotTitle = "During Crowding"
     chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis,
             dataset, orientation, show, toolTips, urls)
     frame = ChartFrame("Crowding Density", chart)
-    frame.setVisible(true);
-    frame.pack();
+    frame.setVisible(true)
+    frame.pack()
 
 
     dataset = HistogramDataset()
@@ -137,8 +144,8 @@ fun findSwitchpoint() {
     chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis,
             dataset, orientation, show, toolTips, urls)
     frame = ChartFrame("Crowding Density", chart)
-    frame.setVisible(true);
-    frame.pack();
+    frame.setVisible(true)
+    frame.pack()
 
 
 }
