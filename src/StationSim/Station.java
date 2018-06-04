@@ -58,7 +58,7 @@ public class Station extends SimState{
     private Bag entrances;
 
     //Analysis agent
-    private Analysis analysis;
+    public Analysis analysis;
 
     // Run with default settings only
     private boolean hideParameters = false;

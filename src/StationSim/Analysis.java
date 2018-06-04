@@ -24,9 +24,7 @@ import sim.util.Double2D;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 /** Class containing various method for analysis of the simulation.
@@ -49,6 +47,7 @@ public class Analysis implements Steppable {
     private int TemporalFileNumber = 0;
     //private int stateFileNumber;
 
+
     Station station;
 
     public Analysis(Station station) {
@@ -57,13 +56,10 @@ public class Analysis implements Steppable {
 
         // Set up data frame
         stateDataFrame = new ArrayList<>();
-        header = Arrays.asList("step", "agent", "x_pos", "y_pos", "speed", "exit");
-        stateDataFrame.add(header);
 
         // Set up aggregateDataFrame
         aggregateDataFrame = new ArrayList<>();
-        header = Arrays.asList("step", "mean_speed", "min_speed", "max_speed", "num_of_people");
-        aggregateDataFrame.add(header);
+
 
         // Set up alternative to using data frame
         //createStateFile();
@@ -91,9 +87,12 @@ public class Analysis implements Steppable {
             System.out.printf(".");
             writeAverageOccupancy();
             System.out.printf(".");
-            writeDataFrame(stateDataFrame, "state_data" + sysTime + ".txt");
+            writeDataFrame(stateDataFrame, "state_data" + sysTime + ".txt",
+                    "step,agent,x_pos,y_pos,speed,exit");
+
             System.out.printf(".");
-            writeDataFrame(aggregateDataFrame, "aggregate_data" + sysTime + ".txt");
+            writeDataFrame(aggregateDataFrame, "aggregate_data" + sysTime + ".txt",
+                    "step,mean_speed,min_speed,max_speed,num_of_people");
             System.out.printf(".");
             station.finish();
             System.out.println("Finished!");
@@ -327,7 +326,7 @@ public class Analysis implements Steppable {
         );
     }
 
-    public void writeDataFrame(List<List<String>> dataFrame, String fileName) {
+    public void writeDataFrame(List<List<String>> dataFrame, String fileName, String header) {
 
         String dirName = "simulation_outputs";
         File dir = new File(dirName);
@@ -341,6 +340,7 @@ public class Analysis implements Steppable {
                     new FileOutputStream(dirName + "/" + fileName),
                     "utf-8"));
 
+            writer.write(header + System.lineSeparator());
             for (List<String> line : dataFrame) {
                 writer.write(String.join(",", line) + System.lineSeparator());
             }
@@ -353,5 +353,38 @@ public class Analysis implements Steppable {
                 System.out.println("Error closing file");
             }
         }
+    }
+
+    public Map<Integer, Integer> getGridDensity(Double minX, Double maxX, Double minY, Double maxY) {
+
+        List<List<String>> subset = new ArrayList<>();
+        for (List<String> line : stateDataFrame) {
+            if (Double.parseDouble(line.get(2)) > minX &&
+                    Double.parseDouble(line.get(2)) < maxX &&
+                    Double.parseDouble(line.get(3)) > minY &&
+                    Double.parseDouble(line.get(3)) < maxY) {
+                subset.add(line);
+            }
+        }
+
+        Map<Integer, Integer> gridDensity = new HashMap<>();
+
+        int count = 0;
+        int step = Integer.parseInt(subset.get(0).get(0));
+        int currentStep;
+        for (List<String> line : subset) {
+            currentStep = Integer.parseInt(line.get(0));
+            if (step == currentStep) {
+                count++;
+            } else {
+                gridDensity.put(step, count);
+                step = currentStep;
+                count = 1;
+            }
+        }
+        gridDensity.put(step, count);
+
+        return gridDensity;
+
     }
 }

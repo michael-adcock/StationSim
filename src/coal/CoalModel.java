@@ -67,8 +67,8 @@ public class CoalModel {
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
         dataset.addSeries("early", earlyArray,50); // Number of bins is 50
         dataset.addSeries("late", lateArray,50); // Number of bins is 50
-        JFreeChart chart = ChartFactory.createHistogram("Rates before and after switchpoint", "Lambda value", "Probability",
-                dataset, PlotOrientation.VERTICAL, true, false, false);
+        JFreeChart chart = ChartFactory.createHistogram("Rates before and after switchpoint", "Lambda value",
+                "Probability", dataset, PlotOrientation.VERTICAL, true, false, false);
         ChartFrame frame = new ChartFrame("", chart);
         frame.setVisible(true);
         frame.pack();
@@ -139,10 +139,10 @@ public class CoalModel {
      */
     public void run() {
         BayesianNetwork net = new BayesianNetwork(switchpoint.getConnectedGraph());
-        Integer numSamples = 50000;
+        Integer numSamples = 100000;
         NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), numSamples, random);
 
-        Integer dropCount = 1000;
+        Integer dropCount = 50000;
         results = posteriorDistSamples.drop(dropCount).downSample(5);
     }
 

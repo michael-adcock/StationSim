@@ -29,16 +29,7 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 
 
-fun findSwitchpoint() {
-
-    // Read in data from csv
-    val csvReader = ReadCsv.fromFile("dummy.csv").expectHeader(false)
-
-    // Place dat in hashMap: step to crowding density
-    val data = HashMap<Int, Int>()
-    for (csvLine in csvReader.readLines()) {
-        data[Integer.parseInt(csvLine[0])] = Integer.parseInt(csvLine[1])
-    }
+fun findSwitchpoint(data : Map<Int, Int>) {
 
     // define start and end
     val startStep : Int = data.keys.min()!!
@@ -69,8 +60,6 @@ fun findSwitchpoint() {
                 val switchpointTwoGreaterThanStep = GreaterThanVertex<Int, Int>(tauTwo, step)
                 ElifVertex<Double>(switchpointOneGreaterThanStep, switchpointTwoGreaterThanStep,
                         lambdaTwo, lambdaTwo, lambdaThree)
-                //val first = IfVertex<Double>(switchpointOneGreaterThanStep, lambdaOne, lambdaTwo)
-                //IfVertex<Double>(switchpointTwoGreaterThanStep, first, lambdaThree)
             }
 
     //rates.forEach { element -> println(element.derivedValue) }
@@ -81,13 +70,10 @@ fun findSwitchpoint() {
             .map<PoissonVertex> {rate -> PoissonVertex(rate) }
             .collect(Collectors.toList())  // future versions of kotlin won't need collect apparently
 
-
+    println(crowding.size)
     //observe data
-    IntStream.range(0, crowding.size).forEach { step ->
-        crowding[step].observe(data.getValue(step))
-    }
+    IntStream.range(0, crowding.size).forEach { i -> crowding[i].observe(data[startStep + i])}
 
-    println(lambdaOne.connectedGraph)
 
     //run model
     val numSamples = 50000
@@ -139,7 +125,7 @@ fun findSwitchpoint() {
 
     dataset = HistogramDataset()
     dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-    dataset.addSeries("Histogram", after.asList().toDoubleArray(), 10);
+    dataset.addSeries("Histogram", after.asList().toDoubleArray(), 10)
     plotTitle = "After Crowding"
     chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis,
             dataset, orientation, show, toolTips, urls)
@@ -150,7 +136,32 @@ fun findSwitchpoint() {
 
 }
 
+fun readCsv(fileName : String) {
+    // Read in data from csv
+    val csvReader = ReadCsv.fromFile(fileName).expectHeader(false)
+
+    // Place dat in hashMap: step to crowding density
+    val data = HashMap<Int, Int>()
+    for (csvLine in csvReader.readLines()) {
+        data[Integer.parseInt(csvLine[0])] = Integer.parseInt(csvLine[1])
+    }
+}
+
 
 fun main(args: Array<String>) {
-    findSwitchpoint()
-}
+
+    val station = Station(System.currentTimeMillis())
+    station.start()
+    do {
+        if (!station.schedule.step(station)) break
+    } while (station.area.getAllObjects().size > 0)
+    val data = station.analysis.getGridDensity(60.0, 80.0, 50.0, 70.0)
+
+    for (entry in data)
+        println("Step: " + entry.key + "\tCrowding:" + entry.value)
+
+    station.finish()
+
+    findSwitchpoint(data)
+    }
+
