@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Change this to your file
-file_name <- "state_data1526293477789.txt"
+file_name <- "state_data1526897238626.txt"
 
 x_axis <- 200
 y_axis <- 100
@@ -16,7 +16,7 @@ static_plot <- function(df, step_choice) {
   axis(2,at=seq(0,y_axis,10),tck=1)
 }
 
-step_choice <- 1000
+step_choice <- 100
 static_plot(states, step_choice)
 static_plot(subset, step_choice)
 

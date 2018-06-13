@@ -369,6 +369,10 @@ public class Analysis implements Steppable {
 
         Map<Integer, Integer> gridDensity = new HashMap<>();
 
+        for (int i = 0; i < subset.size(); i++) {
+            gridDensity.put(i, 0);
+        }
+
         int count = 0;
         int step = Integer.parseInt(subset.get(0).get(0));
         int currentStep;
